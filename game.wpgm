@@ -8,10 +8,16 @@ program farmville {
 	game.height(10)
 	game.width(10)
 	game.ground("ground.png")
+	keyboard.o().onPressDo({personaje.sembrar(new Tomaco())})
+	keyboard.t().onPressDo({personaje.sembrar(new Trigo())})
+	keyboard.m().onPressDo({personaje.sembrar(new Maiz())})
+	keyboard.r().onPressDo({personaje.regar()})
+	keyboard.c().onPressDo({personaje.cosechar()})
+	keyboard.space().onPressDo({personaje.cantidadDePlantasYMonedas()})
+	keyboard.v().onPressDo({personaje.venderTodo()})
 
 	//  VISUALES
  	game.addVisualCharacter(personaje)
- 	game.addVisual(new Maiz()) // Se agrega a modo de prueba
  	
  	//  COMIENZA
 	game.start()

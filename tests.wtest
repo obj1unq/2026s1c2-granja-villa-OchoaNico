@@ -1,0 +1,107 @@
+import personaje.*
+import wollok.game.*
+import cultivos.*
+import estadosDeCultivos.*
+
+describe "Tests de sembrado y regado de cultivos" {
+  test "sembrar Maiz y regar" {
+    game.addVisual(personaje)
+    const maiz = new Maiz()
+    personaje.sembrar(maiz)
+    assert.that(personaje.objetosEnMiCuadrilla().any({elemento => elemento == maiz}))
+    assert.equals(babyCorn, maiz.estado())
+    personaje.regar()
+    assert.equals(adultCorn, maiz.estado())
+  }
+
+  test "sembrar trigo y regar"{
+    game.addVisual(personaje)
+    const trigo = new Trigo()
+    personaje.sembrar(trigo)
+    assert.that(personaje.objetosEnMiCuadrilla().any({elemento => elemento == trigo}))
+    assert.equals(0, trigo.estado())
+    personaje.regar()
+    assert.equals(1, trigo.estado())
+    personaje.regar()
+    assert.equals(2, trigo.estado())
+    personaje.regar()
+    assert.equals(3, trigo.estado())
+    personaje.regar()
+    assert.equals(0, trigo.estado())
+  }
+
+  test "sembrar tomaco en (1,9) y regarlo dos veces"{
+    game.addVisual(personaje)
+    personaje.position(game.at(1,9))
+    const tomaco = new Tomaco()
+    personaje.sembrar(tomaco)
+    assert.that(personaje.objetosEnMiCuadrilla().any({elemento => elemento == tomaco}))
+    assert.equals(game.at(1,9), tomaco.position())
+    personaje.regar()
+    assert.equals(game.at(1,0), tomaco.position())
+    personaje.position(game.at(1,0))
+    personaje.regar()
+    assert.equals(game.at(1,1), tomaco.position())
+  }
+}
+
+describe "Test de cosecha y venta" {
+  test "cosecha de maiz (primero cuando no se puede) y venta" {
+    game.addVisual(personaje)
+    const maiz = new Maiz()
+    personaje.sembrar(maiz)
+    assert.notThat(maiz.estado().esCosechable())
+    personaje.cosechar()
+    assert.equals(0, personaje.cantidadDePlantas())
+    personaje.regar()
+    assert.that(maiz.estado().esCosechable())
+    personaje.cosechar()
+    assert.equals(1, personaje.cantidadDePlantas())
+    assert.throwsException({personaje.cosechar()})
+    assert.equals(0, personaje.monedas())
+    personaje.venderTodo()
+    assert.equals(150, personaje.monedas())
+  }
+
+   test "Cosecha de dos trigos, uno en estado 2 y el otro en 3 y venta"{
+        game.addVisual(personaje)
+        const trigo1 = new Trigo()
+        const trigo2 = new Trigo()
+        personaje.sembrar(trigo1)
+        assert.equals(0, trigo1.estado())
+        personaje.regar()
+        assert.equals(1, trigo1.estado())
+        personaje.sembrar(trigo2)
+        assert.equals(0, trigo2.estado())
+        personaje.cosechar()
+        assert.equals(0, personaje.cantidadDePlantas())
+        personaje.regar()
+        personaje.regar()
+        assert.equals(3, trigo1.estado())
+        assert.equals(2, trigo2.estado())
+        personaje.cosechar()
+        assert.equals(2, personaje.cantidadDePlantas())
+        assert.equals(0, personaje.monedas())
+        personaje.venderTodo()
+        assert.equals(300, personaje.monedas())
+        assert.equals(0, personaje.cantidadDePlantas())
+   }
+
+    test "Cosecha y venta de 3 tomacos"{
+        game.addVisual(personaje)
+        const tomaco1 = new Tomaco()
+        const tomaco2 = new Tomaco()
+        const tomaco3 = new Tomaco()
+        personaje.sembrar(tomaco1)
+        personaje.sembrar(tomaco2)
+        personaje.sembrar(tomaco3)
+        assert.equals(0, personaje.cantidadDePlantas())
+        assert.equals(0, personaje.monedas())
+        personaje.cosechar()
+        assert.equals(3, personaje.cantidadDePlantas())
+        personaje.venderTodo()
+        assert.equals(240, personaje.monedas())
+        assert.equals(0, personaje.cantidadDePlantas())
+    }
+
+}
